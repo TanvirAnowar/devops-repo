@@ -1,7 +1,10 @@
 # Step 1: Use the official ASP.NET runtime image (for running the app later)
 FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
 WORKDIR /app
-EXPOSE 5000
+
+# Make ASP.NET listen on all network interfaces on port 80
+ENV ASPNETCORE_URLS=http://+:80
+EXPOSE 80
 
 # Step 2: Use the .NET SDK image (for building the app)
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
