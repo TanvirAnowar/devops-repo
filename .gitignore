@@ -53,3 +53,5 @@ dkms.conf
 
 # debug information files
 *.dwo
+/DotNetDemoProject/DotNetDemoProject/obj
+/DotNetDemoProject/DotNetDemoProject/bin/Debug/net5.0
