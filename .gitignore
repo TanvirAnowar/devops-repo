@@ -59,3 +59,4 @@ dkms.conf
 /TradingPlatform/obj/Debug/net5.0
 /TradingPlatform/TradingPlatform/bin/Debug/net8.0
 /TradingPlatform/TradingPlatform/obj
+/TradingPlatform/TradingPlatform/appsettings.json
