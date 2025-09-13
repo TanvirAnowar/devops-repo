@@ -34,6 +34,20 @@ namespace TradingPlatform.Services
                 results.Add(result);
             }
 
+            // Compute ADX only for last 10 candles
+            var adxList = IndicatorCalculator.CalculateAdxLastCandles(candleList, 14, 10);
+
+            // Compute ATR only for last 10 candles
+            var atrList = IndicatorCalculator.CalculateAtrLastCandles(candleList, 14, 10);
+
+
+            // Attach results to last 10 IndicatorResult objects
+            for (int f = candleList.Count - 10, j = 0; f < candleList.Count; f++, j++)
+            {
+                results[f].Adx = adxList[j];
+                results[f].Atr = atrList[j];
+            }
+
             return results.GetRange(results.Count -2, 2);
         }
     }

@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
 using TradingPlatform.Models;
+using TradingPlatform.Utils;
 
 namespace TradingPlatform.Services
 {
@@ -17,9 +18,15 @@ namespace TradingPlatform.Services
             string instrument = "EUR_USD",
             string granularity = "H1",
             int count = 150,
-            string bearerToken = "be08a1aeba013ec91802c210aaff8488-12ee356da5a3c7a5db924d2a5b5e3396")
+            string bearerToken = ""
+        )
         {
-            var url = $"https://api-fxpractice.oanda.com/v3/accounts/101-004-24777125-001/instruments/{instrument}/candles?count={count}&granularity={granularity}";
+            if (string.IsNullOrEmpty(bearerToken))
+            {
+                bearerToken = AppConfig.Get("ApiSettings:OandaAPIKey");
+            }
+
+            var url = $"{AppConfig.Get("ApiSettings:BaseUrl")}/{instrument}/candles?count={count}&granularity={granularity}";
 
             _httpClient.DefaultRequestHeaders.Clear();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);

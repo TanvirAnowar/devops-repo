@@ -1,0 +1,21 @@
+2025-09-13 16:40:12.557 +00:00 [INF] Now listening on: http://[::]:8080
+2025-09-13 16:40:12.656 +00:00 [INF] Now listening on: https://[::]:808122025-09-13 16:40:12.662 +00:00 [INF] Application started. Press Ctrl+C t2025-09-13 162025-09-13 16:40:12.664 +00:00 [INF] Hosting environment: Development
+2025-09-13 16:40:12.666 +00:00 [INF] Content root path: /app
+2025-09-13 16:40:15.685 +00:00 [INF] Request starting HTTP/2 GET https:/2025-09-13 16:40:15.685 +00:00 [INF] Request starting2025-09-13 16:40:15.990 +00:00 [INF] Request finished HTTP/2 GET https:/2025-09-13 16:40:15.990 +00:00 [INF] Request finished HTTP/2 GET https://localhost:32783/swagg2025-09-13 16:40:35.113 +00:00 [INF] Request starting HTTP/2 POST https:2025-09-13 16:40:35.113 +00:00 [INF] Request starting HTTP/2 POST h2025-09-13 16:40:35.168 +00:00 [INF] Executing endpoint 'TradingPlatform2025-09-13 16:40:35.168 +00:00 [INF] Executing endpoint 'TradingPl2025-09-13 16:40:35.218 +00:00 [INF] Route matched with {action = "Execu2025-09-13 16:40:35.218 +00:00 [INF] Route matched with {action = "ExecuteOrade", controller = "Indicators"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] ExecuteOrade(TradingPlatform.Controllers.IndicatorRequest) on control2025-09-13 16:40:35.425 +00:00 [INF] Start processing HTTP request GET h2025-09-13 16:40:35.425 +00:00 [INF] Start processing HTTP request GET https://api-fxpractice.oanda.com/v3/accounts/102025-09-13 16:40:35.430 +00:00 [INF] Sending HTTP request GET https://ap2025-09-13 16:40:35.430 +00:00 [INF] Sending HTTP request GET https://api-fxpractice.oanda.com/v3/accounts/102025-09-13 16:40:36.154 +00:00 [INF] Received HTTP response headers afte2025-09-13 16:40:32025-09-13 16:40:36.157 +00:00 [INF] End processing HTTP request after 72025-09-13 16:402025-09-13 16:40:36.204 +00:00 [INF] Start processing HTTP request GET h2025-09-13 16:40:36.204 +00:00 [INF] Start processing HTTP request GET https://api-fxpractice.oanda.com/v3/accounts/102025-09-13 16:40:36.206 +00:00 [INF] Sending HTTP request GET https://ap2025-09-13 16:40:36.206 +00:00 [INF] Sending HTTP request GET https://api-fxpractice.oanda.com/v3/accounts/102025-09-13 16:40:36.335 +00:00 [INF] Received HTTP response headers afte2025-09-13 16:40:362025-09-13 16:40:36.336 +00:00 [INF] End processing HTTP request after 12025-09-13 16:402025-09-13 16:40:41.001 +00:00 [INF]  ---- Log Start 09/13/2025 16:40:362025-09-13 16:40:41.001 +00:00 [INF]  ---- Log Start 09/13/2025 16:40:36 ---------
+Market Bias: Neutral
+
+Trade Setup Info: {
+  "time": "2025-09-12T20:50:00Z",
+  "open": 1.17298,
+  "high": 1.17324,
+  "low": 1.17296,
+  "close": 1.17324,
+  "volume": 158,
+  "tenkanSen": 1.17307,
+  "kijunSen": 1.173525,
+  "senkouSpanA": 1.1732975,
+  "senkouSpanB": 1.173195,
+  "chikouSpan": 1.17394,
+  "rsi": 38.607594936708860759493660229,
+  "adx": 25.110773898137979967824629278,
+  "atr": 0.00021382025-09-13 16:40:41.019 +00:00 [INF] Executing OkObjectResult, writing v2025-09-13 16:40:41.019 +00:02025-09-13 16:40:41.048 +00:00 [INF] Executed action TradingPlatform.Con2025-09-13 16:40:41.048 +00:00 [INF] Executed action TradingPlatform.Control2025-09-13 16:40:41.051 +00:00 [INF] Executed endpoint 'TradingPlatform.2025-09-13 16:40:41.051 +00:00 [INF] Executed endpoint 'TradingPl2025-09-13 16:40:41.054 +00:00 [INF] Request finished HTTP/2 POST https:2025-09-13 16:40:41.054 +00:00 [INF] Request finished HTTP/2 POST https://localhost:32783/api/Indicators/executeorder - 200 null application/json; charset=utf-8 5941.1363ms

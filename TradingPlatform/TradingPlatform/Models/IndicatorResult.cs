@@ -16,5 +16,9 @@ namespace TradingPlatform.Models
         public decimal? ChikouSpan { get; set; }
 
         public decimal? Rsi { get; set; }
+
+        public decimal? Adx { get; set; }
+
+        public decimal? Atr { get; set; }
     }
 }

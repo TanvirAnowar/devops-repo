@@ -13,9 +13,16 @@ namespace TradingPlatform.Models
         public int Period { get; set; } = 14;
     }
 
+    public class AdxConfig
+    {
+        public int Period { get; set; } = 14;
+    }
+
     public class IndicatorConfig
     {
         public IchimokuConfig Ichimoku { get; set; } = new IchimokuConfig();
         public RsiConfig Rsi { get; set; } = new RsiConfig();
+
+        public AdxConfig Adx { get; set; } = new AdxConfig();
     }
 }

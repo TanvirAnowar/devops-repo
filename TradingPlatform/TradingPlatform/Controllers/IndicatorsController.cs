@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 using TradingPlatform.Models;
 using TradingPlatform.Services;
 
@@ -10,11 +11,16 @@ namespace TradingPlatform.Controllers
     {
         private readonly IIndicatorService _indicatorService;
         private readonly IOandaService _oandaService;
+        private readonly IOrderService _orderService;
+        private readonly ILogger<OrderService> _logger;
 
-        public IndicatorsController(IIndicatorService indicatorService, IOandaService oandaService)
+
+        public IndicatorsController(IIndicatorService indicatorService, IOandaService oandaService, IOrderService orderService, ILogger<OrderService> logger) 
         {
             _indicatorService = indicatorService;
             _oandaService = oandaService;
+            _orderService = orderService; 
+            _logger = logger;
         }
 
         [HttpPost("calculate")]
@@ -42,8 +48,8 @@ namespace TradingPlatform.Controllers
             return Ok(results);
         }
 
-        [HttpPost("taketrake")]
-        public async Task<IActionResult> TakeTrake([FromBody] IndicatorRequest request)
+        [HttpPost("executeorder")]
+        public async Task<IActionResult> ExecuteOrade([FromBody] IndicatorRequest request)
         {
             List<Candle> candles;
 
@@ -55,16 +61,17 @@ namespace TradingPlatform.Controllers
             {
                 candles = await _oandaService.GetCandlesAsync(
                     request.Instrument ?? "EUR_USD",
-                    request.Granularity ?? "H1",
+                    request.Granularity ?? "M5",
                     request.Count ?? 150,
                     request.BearerToken ?? "be08a1aeba013ec91802c210aaff8488-12ee356da5a3c7a5db924d2a5b5e3396"
                 );
             }
 
             var config = request.Config ?? new IndicatorConfig();
-            var results = _indicatorService.CalculateIndicators(candles, config);
+            //  var results = _indicatorService.CalculateIndicators(candles, config);
+            var result2 = await _orderService.ExecuteOrder(candles, config);
 
-            return Ok(results);
+            return Ok(result2);
         }
     }
 
