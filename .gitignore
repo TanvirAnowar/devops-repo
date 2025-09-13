@@ -55,3 +55,7 @@ dkms.conf
 *.dwo
 /DotNetDemoProject/DotNetDemoProject/obj
 /DotNetDemoProject/DotNetDemoProject/bin/Debug/net5.0
+/TradingPlatform/.vs
+/TradingPlatform/obj/Debug/net5.0
+/TradingPlatform/TradingPlatform/bin/Debug/net8.0
+/TradingPlatform/TradingPlatform/obj
