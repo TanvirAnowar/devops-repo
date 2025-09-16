@@ -60,3 +60,4 @@ dkms.conf
 /TradingPlatform/TradingPlatform/bin/Debug/net8.0
 /TradingPlatform/TradingPlatform/obj
 /TradingPlatform/TradingPlatform/appsettings.json
+/TradingPlatform/TradingPlatform/Logs/app_log20250916.txt
