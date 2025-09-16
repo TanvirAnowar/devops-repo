@@ -26,7 +26,7 @@ namespace TradingPlatform.Services
                 bearerToken = AppConfig.Get("ApiSettings:OandaAPIKey");
             }
 
-            var url = $"{AppConfig.Get("ApiSettings:BaseUrl")}/{instrument}/candles?count={count}&granularity={granularity}";
+            var url = $"{AppConfig.Get("ApiSettings:BaseUrl")}instruments/{instrument}/candles?count={count}&granularity={granularity}";
 
             _httpClient.DefaultRequestHeaders.Clear();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
@@ -57,17 +57,15 @@ namespace TradingPlatform.Services
         }
 
         public async Task<decimal> CalculateLotSizeAsync(
-            string pair,
-            int stopLossPips,
+            string pair,           
             decimal riskPercent,
-            string bearerToken = ""
+            IndicatorResult lastCandle,
+            decimal stopLossPips,
+            Bias marketBias
         )
         {
-            if (string.IsNullOrEmpty(bearerToken))
-            {
-                bearerToken = AppConfig.Get("ApiSettings:OandaAPIKey");
-            }
-
+            var bearerToken = AppConfig.Get("ApiSettings:OandaAPIKey");
+            
             var url = $"{AppConfig.Get("ApiSettings:BaseUrl")}/summary";
             _httpClient.DefaultRequestHeaders.Clear();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
@@ -89,6 +87,9 @@ namespace TradingPlatform.Services
 
             decimal riskAmount = balance * (riskPercent / 100m);
             decimal pipValue = pair.StartsWith("XAU") ? 1m : 10m; // crude example
+
+       //     var stopLossPips = IndicatorCalculator.CalculateStopLossForCandle(lastCandle,marketBias);
+
             decimal lotSize = riskAmount / (stopLossPips * pipValue);
 
             return Math.Round(lotSize, 2);

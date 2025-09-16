@@ -63,47 +63,60 @@ namespace TradingPlatform.Services
 
                 logString += $"\nTrade Setup Info: {json}\n";
 
-                Console.WriteLine(json);
+                //Console.WriteLine(json);
+
+                var stopLossPips = IndicatorCalculator.CalculateStopLossForCandle(analyzeTradeCandle, marketBias);
+                var lotSize = await _oandaService.CalculateLotSizeAsync(
+                           "EUR/USD",
+                           decimal.Parse(AppConfig.Get("TradeSettings:Risk")), // You need to provide a decimal riskPercent value here, replace 1 with your actual risk percent
+                           analyzeTradeCandle,
+                           stopLossPips,
+                           marketBias
+                           );
+
+                logString += string.Format($"Calculated SL Size: {stopLossPips}\nCalculated Lot Size: {lotSize}\n");
 
                 if (marketBias == Bias.Bullish)
                 {
-                    if (lastClosingPrice > analyzeTradeCandle.TenkanSen && analyzeTradeCandle.Adx >= 20 && analyzeTradeCandle.Rsi >= 55)
+                    if ( lastClosingPrice > analyzeTradeCandle.Open && lastClosingPrice > analyzeTradeCandle.KijunSen && analyzeTradeCandle.Adx >= 20 && analyzeTradeCandle.Rsi >= 55)
                     {
 
-                        Console.WriteLine("Place Buy Order");
+                       
+
+                        // Console.WriteLine("Place Buy Order");
                         logString += string.Format($"Place Buy Order\n");
                     }
                     else
                     {
-                        Console.WriteLine("Buy Trade setup not formed");
+                       // Console.WriteLine("Buy Trade setup not formed");
                         logString += string.Format($"Buy Trade setup not formed\n");
 
                     }
                 }
                 else if (marketBias == Bias.Bearish)
                 {
-                    if (lastClosingPrice < analyzeTradeCandle.TenkanSen && analyzeTradeCandle.Adx >= 20 && analyzeTradeCandle.Rsi <= 45)
+                    if (lastClosingPrice < analyzeTradeCandle.Open && lastClosingPrice < analyzeTradeCandle.KijunSen && analyzeTradeCandle.Adx >= 20 && analyzeTradeCandle.Rsi <= 45)
                     {
-                        Console.WriteLine("Place Sell Order");
+                    //    Console.WriteLine("Place Sell Order");
                         logString += string.Format($"Place Sell Order\n");
                     }
                     else
                     {
-                        Console.WriteLine("Sell Trade setup not formed");
+                     //   Console.WriteLine("Sell Trade setup not formed");
                         logString += string.Format($"Sell Trade setup not formed\n");
 
                     }
                 }
                 else
                 {
-                    Console.WriteLine("No Clear Market Bias");
+                //    Console.WriteLine("No Clear Market Bias");
                     logString += string.Format($"No Clear Market Bias\n");
                 }
 
                 logString += string.Format($"------ Log End ----------\n");
 
                 _logger.LogInformation($" {logString}", DateTime.UtcNow);
-                Console.WriteLine(json);
+                Console.WriteLine(logString);
             }
 
 
@@ -112,13 +125,7 @@ namespace TradingPlatform.Services
             return 1;
         }
 
-        private enum Bias
-        {
-            Bullish,
-            Bearish,
-            Neutral
-        }
-
+       
 
         // Keep the async version for future use if interface is updated
         private async Task<Bias> GetBiasStatusAsync(IndicatorConfig config, string higherTimeframe = "H1")
@@ -132,10 +139,10 @@ namespace TradingPlatform.Services
 
             var results = _indicatorService.CalculateIndicators(candles, config);
 
-            if (results.First().Close > results.First().TenkanSen && results.Last().Adx > 20)
+            if (results.First().Close > results.First().KijunSen && results.Last().Adx > 20)
                 return Bias.Bullish;
 
-            if (results.First().Close < results.First().TenkanSen && results.Last().Adx > 20)
+            if (results.First().Close < results.First().KijunSen && results.Last().Adx > 20)
                 return Bias.Bearish;
 
             return Bias.Neutral;

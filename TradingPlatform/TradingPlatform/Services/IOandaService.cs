@@ -12,9 +12,10 @@ namespace TradingPlatform.Services
 
         Task<decimal> CalculateLotSizeAsync(
             string pair,
-            int stopLossPips,
             decimal riskPercent,
-            string bearerToken = ""
+            IndicatorResult lastCandle,
+            decimal stopLossPips,
+            Bias marketBias
         );
     }
 }

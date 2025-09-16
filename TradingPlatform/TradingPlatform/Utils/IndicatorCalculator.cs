@@ -201,5 +201,57 @@ namespace TradingPlatform.Utils
             return results;
         }
 
+        public static decimal CalculateStopLossForCandle(IndicatorResult candle, Bias orderBias)
+        {
+            decimal stopLossPips = candle.Atr??0 * 1.5m;
+
+            if (orderBias == Bias.Bullish)
+            {
+                // Tenkan inside candle
+                if (candle.KijunSen >= candle.Low && candle.KijunSen <= candle.High)
+                {
+                    // Stop loss from low minus ATR-based pips
+                    return candle.Low - stopLossPips;
+                }
+                // Tenkan below candle
+                else if (candle.KijunSen < candle.Low)
+                {
+                    // Stop loss from tenkan minus ATR-based pips
+                    return (candle.KijunSen ?? 0) - stopLossPips;
+                }
+                // Tenkan above candle (not covered by your logic)
+                else
+                {
+                    // Default: stop loss from low minus ATR-based pips
+                    return candle.Low - stopLossPips;
+                }
+            }
+            else if (orderBias == Bias.Bearish)
+            {
+                // Tenkan inside candle
+                if (candle.KijunSen >= candle.Low && candle.KijunSen <= candle.High)
+                {
+                    // Stop loss from high plus ATR-based pips
+                    return candle.High + stopLossPips;
+                }
+                // Tenkan above candle
+                else if (candle.KijunSen > candle.High)
+                {
+                    // Stop loss from tenkan plus ATR-based pips
+                    return (candle.KijunSen ?? 0) + stopLossPips;
+                }
+                // Tenkan below candle (not covered by your logic)
+                else
+                {
+                    // Default: stop loss from high plus ATR-based pips
+                    return candle.High + stopLossPips;
+                }
+            }
+            else
+            {
+                // Neutral or unknown bias, return candle close as fallback
+                return candle.Close;
+            }
+        }
     }
 }
