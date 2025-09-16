@@ -48,7 +48,7 @@ namespace TradingPlatform.Services
 
             if (results.Any())
             {
-                var analyzeTradeCandle = results.First();
+                var analyzeTradeCandle = results.Last();
 
                 var lastClosingPrice = analyzeTradeCandle.Close;
 
@@ -73,6 +73,12 @@ namespace TradingPlatform.Services
                         Console.WriteLine("Place Buy Order");
                         logString += string.Format($"Place Buy Order\n");
                     }
+                    else
+                    {
+                        Console.WriteLine("Buy Trade setup not formed");
+                        logString += string.Format($"Buy Trade setup not formed\n");
+
+                    }
                 }
                 else if (marketBias == Bias.Bearish)
                 {
@@ -80,6 +86,12 @@ namespace TradingPlatform.Services
                     {
                         Console.WriteLine("Place Sell Order");
                         logString += string.Format($"Place Sell Order\n");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Sell Trade setup not formed");
+                        logString += string.Format($"Sell Trade setup not formed\n");
+
                     }
                 }
                 else
@@ -120,10 +132,10 @@ namespace TradingPlatform.Services
 
             var results = _indicatorService.CalculateIndicators(candles, config);
 
-            if (results.First().Close > results.First().TenkanSen && results.First().Adx > 20)
+            if (results.First().Close > results.First().TenkanSen && results.Last().Adx > 20)
                 return Bias.Bullish;
 
-            if (results.First().Close < results.First().TenkanSen && results.First().Adx > 20)
+            if (results.First().Close < results.First().TenkanSen && results.Last().Adx > 20)
                 return Bias.Bearish;
 
             return Bias.Neutral;

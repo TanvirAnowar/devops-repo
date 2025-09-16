@@ -27,6 +27,7 @@ builder.Services.AddScoped<IIndicatorService, IndicatorService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddHttpClient<IOandaService, OandaService>();
 
+//Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -40,11 +41,14 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "MTradingPlatform API v1");
+    });
 }
 
 app.UseHttpsRedirection();
-
+app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllers();
