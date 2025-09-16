@@ -55,5 +55,43 @@ namespace TradingPlatform.Services
 
             return candles;
         }
+
+        public async Task<decimal> CalculateLotSizeAsync(
+            string pair,
+            int stopLossPips,
+            decimal riskPercent,
+            string bearerToken = ""
+        )
+        {
+            if (string.IsNullOrEmpty(bearerToken))
+            {
+                bearerToken = AppConfig.Get("ApiSettings:OandaAPIKey");
+            }
+
+            var url = $"{AppConfig.Get("ApiSettings:BaseUrl")}/summary";
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+
+            var response = await _httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(json);
+
+            var account = doc.RootElement.GetProperty("account");
+            var balance = decimal.Parse(account.GetProperty("balance").GetString()!);
+
+            // Example calculation for lot size (for USD accounts, major pairs/metals)
+            // RiskAmount = balance * (riskPercent / 100)
+            // LotSize = RiskAmount / (stopLossPips * PipValue)
+            // PipValue for standard lot (100,000 units) for USD pairs is usually $10 per pip
+            // For metals, adjust accordingly (e.g., XAUUSD pip value is $1 for 1 lot)
+
+            decimal riskAmount = balance * (riskPercent / 100m);
+            decimal pipValue = pair.StartsWith("XAU") ? 1m : 10m; // crude example
+            decimal lotSize = riskAmount / (stopLossPips * pipValue);
+
+            return Math.Round(lotSize, 2);
+        }
     }
 }

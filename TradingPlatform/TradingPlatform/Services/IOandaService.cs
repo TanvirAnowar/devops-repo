@@ -9,5 +9,12 @@ namespace TradingPlatform.Services
             string granularity = "H1", 
             int count = 150, 
             string bearerToken = "");
+
+        Task<decimal> CalculateLotSizeAsync(
+            string pair,
+            int stopLossPips,
+            decimal riskPercent,
+            string bearerToken = ""
+        );
     }
 }
