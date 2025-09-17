@@ -17,14 +17,16 @@ namespace TradingPlatform.Services
         private readonly IIndicatorService _indicatorService;
         private readonly IOandaService _oandaService;
         private readonly ILogger<OrderService> _logger;
+        private readonly ITradeStatusService _tradeStatusService;
 
 
 
-        public OrderService(IIndicatorService indicatorService, IOandaService oandaService, ILogger<OrderService> logger)
+        public OrderService(IIndicatorService indicatorService, IOandaService oandaService, ILogger<OrderService> logger, ITradeStatusService tradeStatusService)
         {
             _indicatorService = indicatorService;
             _oandaService = oandaService;
             _logger = logger;
+            _tradeStatusService = tradeStatusService;
         }
 
         // Change the return type of ExecuteOrder from Task<int> to int and remove 'async' and 'await' usage
@@ -121,7 +123,7 @@ namespace TradingPlatform.Services
 
 
 
-
+            var x = await _tradeStatusService.GetAllAsync();
             return 1;
         }
 

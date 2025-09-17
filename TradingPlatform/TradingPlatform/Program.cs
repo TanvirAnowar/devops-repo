@@ -1,6 +1,7 @@
 ﻿using TradingPlatform.Services;
 using TradingPlatform.Utils;
 using Serilog;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,11 +21,19 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog(); // replace default logger
 
+// Configure DbContext with MySQL
+var dbConfig = builder.Configuration.GetSection("Database");
+string connectionString = $"Server={dbConfig["Host"]};Port={dbConfig["Port"]};Database={dbConfig["Name"]};User={dbConfig["UserId"]};Password={dbConfig["Password"]};";
+
+builder.Services.AddDbContext<TradingPlatformDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 builder.Services.AddScoped<IIndicatorService, IndicatorService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ITradeStatusService, TradeStatusService>();
 builder.Services.AddHttpClient<IOandaService, OandaService>();
 
 //Swagger
