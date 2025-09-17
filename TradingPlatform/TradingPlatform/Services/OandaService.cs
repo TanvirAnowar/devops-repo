@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using TradingPlatform.Models;
 using TradingPlatform.Utils;
@@ -57,7 +58,7 @@ namespace TradingPlatform.Services
         }
 
         public async Task<decimal> CalculateLotSizeAsync(
-            string pair,           
+            string pair,
             decimal riskPercent,
             IndicatorResult lastCandle,
             decimal stopLossPips,
@@ -65,7 +66,7 @@ namespace TradingPlatform.Services
         )
         {
             var bearerToken = AppConfig.Get("ApiSettings:OandaAPIKey");
-            
+
             var url = $"{AppConfig.Get("ApiSettings:BaseUrl")}/summary";
             _httpClient.DefaultRequestHeaders.Clear();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
@@ -88,11 +89,52 @@ namespace TradingPlatform.Services
             decimal riskAmount = balance * (riskPercent / 100m);
             decimal pipValue = pair.StartsWith("XAU") ? 1m : 10m; // crude example
 
-       //     var stopLossPips = IndicatorCalculator.CalculateStopLossForCandle(lastCandle,marketBias);
+            //     var stopLossPips = IndicatorCalculator.CalculateStopLossForCandle(lastCandle,marketBias);
 
             decimal lotSize = riskAmount / (stopLossPips * pipValue);
 
             return Math.Round(lotSize, 2);
         }
+
+        public async Task<OrderResponse> PlaceOrderAsync(
+            OrderRequest orderRequest,
+            string bearerToken = ""
+        )
+        {
+            if (string.IsNullOrEmpty(bearerToken))
+            {
+                bearerToken = AppConfig.Get("ApiSettings:OandaAPIKey");
+            }
+
+            var url = $"{AppConfig.Get("ApiSettings:BaseUrl")}/orders";
+
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+            };
+
+            var content = new StringContent(
+                JsonSerializer.Serialize(orderRequest, options),
+                Encoding.UTF8,
+                "application/json"
+            );
+
+            var response = await _httpClient.PostAsync(url, content);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<OrderResponse>(json, options)
+                   ?? throw new InvalidOperationException("Failed to deserialize order response");
+        }
     }
+
+    // Define model classes for the order request and response
+   
+
+    
 }

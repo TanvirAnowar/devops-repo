@@ -17,5 +17,10 @@ namespace TradingPlatform.Services
             decimal stopLossPips,
             Bias marketBias
         );
+        
+        Task<OrderResponse> PlaceOrderAsync(
+            OrderRequest orderRequest,
+            string bearerToken = ""
+        );
     }
 }

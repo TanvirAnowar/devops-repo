@@ -67,30 +67,28 @@ namespace TradingPlatform.Services
 
                 //Console.WriteLine(json);
 
-                var stopLossPips = IndicatorCalculator.CalculateStopLossForCandle(analyzeTradeCandle, marketBias);
-                var lotSize = await _oandaService.CalculateLotSizeAsync(
-                           "EUR/USD",
-                           decimal.Parse(AppConfig.Get("TradeSettings:Risk")), // You need to provide a decimal riskPercent value here, replace 1 with your actual risk percent
-                           analyzeTradeCandle,
-                           stopLossPips,
-                           marketBias
-                           );
+                
 
-                logString += string.Format($"Calculated SL Size: {stopLossPips}\nCalculated Lot Size: {lotSize}\n");
+                
 
                 if (marketBias == Bias.Bullish)
                 {
-                    if ( lastClosingPrice > analyzeTradeCandle.Open && lastClosingPrice > analyzeTradeCandle.KijunSen && analyzeTradeCandle.Adx >= 20 && analyzeTradeCandle.Rsi >= 55)
+                    if (lastClosingPrice > analyzeTradeCandle.Open && lastClosingPrice > analyzeTradeCandle.KijunSen && analyzeTradeCandle.Adx >= 20 && analyzeTradeCandle.Rsi >= 55)
                     {
 
-                       
+
+                        (decimal stopLossPips, decimal lotSize) = await StopLossAndLotSizeCalculation(marketBias, analyzeTradeCandle);
+                        
+                        logString += string.Format($"Calculated SL Size: {stopLossPips}\nCalculated Lot Size: {lotSize}\n");
+
+
 
                         // Console.WriteLine("Place Buy Order");
                         logString += string.Format($"Place Buy Order\n");
                     }
                     else
                     {
-                       // Console.WriteLine("Buy Trade setup not formed");
+                        // Console.WriteLine("Buy Trade setup not formed");
                         logString += string.Format($"Buy Trade setup not formed\n");
 
                     }
@@ -99,19 +97,19 @@ namespace TradingPlatform.Services
                 {
                     if (lastClosingPrice < analyzeTradeCandle.Open && lastClosingPrice < analyzeTradeCandle.KijunSen && analyzeTradeCandle.Adx >= 20 && analyzeTradeCandle.Rsi <= 45)
                     {
-                    //    Console.WriteLine("Place Sell Order");
+                        //    Console.WriteLine("Place Sell Order");
                         logString += string.Format($"Place Sell Order\n");
                     }
                     else
                     {
-                     //   Console.WriteLine("Sell Trade setup not formed");
+                        //   Console.WriteLine("Sell Trade setup not formed");
                         logString += string.Format($"Sell Trade setup not formed\n");
 
                     }
                 }
                 else
                 {
-                //    Console.WriteLine("No Clear Market Bias");
+                    //    Console.WriteLine("No Clear Market Bias");
                     logString += string.Format($"No Clear Market Bias\n");
                 }
 
@@ -127,7 +125,20 @@ namespace TradingPlatform.Services
             return 1;
         }
 
-       
+        private async Task<(decimal stopLossPips, decimal lotSize)> StopLossAndLotSizeCalculation(Bias marketBias, IndicatorResult analyzeTradeCandle)
+        {
+            var stopLossPips = IndicatorCalculator.CalculateStopLossForCandle(analyzeTradeCandle, marketBias);
+            var lotSize = await _oandaService.CalculateLotSizeAsync(
+                       "EUR/USD",
+                       decimal.Parse(AppConfig.Get("TradeSettings:Risk")), // You need to provide a decimal riskPercent value here, replace 1 with your actual risk percent
+                       analyzeTradeCandle,
+                       stopLossPips,
+                       marketBias
+                       );
+            return (stopLossPips, lotSize);
+        }
+
+
 
         // Keep the async version for future use if interface is updated
         private async Task<Bias> GetBiasStatusAsync(IndicatorConfig config, string higherTimeframe = "H1")
