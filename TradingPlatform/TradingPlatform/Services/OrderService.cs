@@ -71,17 +71,20 @@ namespace TradingPlatform.Services
 
                 
 
-                if (marketBias == Bias.Bullish)
+              //  if (marketBias == Bias.Bullish)
+              if (true)
                 {
-                    if (lastClosingPrice > analyzeTradeCandle.Open && lastClosingPrice > analyzeTradeCandle.KijunSen && analyzeTradeCandle.Adx >= 20 && analyzeTradeCandle.Rsi >= 55)
+                //    if (lastClosingPrice > analyzeTradeCandle.Open && lastClosingPrice > analyzeTradeCandle.KijunSen && analyzeTradeCandle.Adx >= 25 && analyzeTradeCandle.Rsi >= 55)
+                  if(true)
                     {
 
 
-                        (decimal stopLossPips, decimal lotSize) = await StopLossAndLotSizeCalculation(marketBias, analyzeTradeCandle);
+                        (decimal stopLossLevel, decimal lotSize) = await StopLossAndLotSizeCalculation(marketBias, analyzeTradeCandle);
                         
-                        logString += string.Format($"Calculated SL Size: {stopLossPips}\nCalculated Lot Size: {lotSize}\n");
+                        logString += string.Format($"Calculated SL Size: {stopLossLevel}\nCalculated Lot Size: {lotSize}\n");
 
 
+                        var response = await PlaceOrder(lastClosingPrice, stopLossLevel, lotSize, marketBias);
 
                         // Console.WriteLine("Place Buy Order");
                         logString += string.Format($"Place Buy Order\n");
@@ -97,6 +100,12 @@ namespace TradingPlatform.Services
                 {
                     if (lastClosingPrice < analyzeTradeCandle.Open && lastClosingPrice < analyzeTradeCandle.KijunSen && analyzeTradeCandle.Adx >= 20 && analyzeTradeCandle.Rsi <= 45)
                     {
+                        (decimal stopLossLevel, decimal lotSize) = await StopLossAndLotSizeCalculation(marketBias, analyzeTradeCandle);
+
+                        logString += string.Format($"Calculated SL Size: {stopLossLevel}\nCalculated Lot Size: {lotSize}\n");
+
+                        var response = await PlaceOrder(lastClosingPrice, stopLossLevel, lotSize, marketBias );
+
                         //    Console.WriteLine("Place Sell Order");
                         logString += string.Format($"Place Sell Order\n");
                     }
@@ -125,17 +134,47 @@ namespace TradingPlatform.Services
             return 1;
         }
 
-        private async Task<(decimal stopLossPips, decimal lotSize)> StopLossAndLotSizeCalculation(Bias marketBias, IndicatorResult analyzeTradeCandle)
+        private async Task<OrderResponse> PlaceOrder(decimal lastClosingPrice, decimal stopLossLevel, decimal lotSize, Bias bias)
         {
-            var stopLossPips = IndicatorCalculator.CalculateStopLossForCandle(analyzeTradeCandle, marketBias);
+            lotSize = bias == Bias.Bearish ? (lotSize * -1) : lotSize;
+          
+            var response = await _oandaService.PlaceOrderAsync(new OrderRequest
+            {
+                order = new OrderRequest.Order
+                {
+                    Instrument = "EUR_USD",
+                    Units = (int)(lotSize * 100000),
+                    Type = "MARKET",
+                    StopLossOnFill = new OrderRequest.StopLossOnFill
+                    {
+                        Price = Math.Round(stopLossLevel, 5).ToString() 
+                    },
+                    TakeProfitOnFill = new OrderRequest.TakeProfitOnFill
+                    {
+                        Price = bias == Bias.Bullish ?
+                             Math.Round((lastClosingPrice + Math.Abs(lastClosingPrice - stopLossLevel) * 6),5).ToString() :
+                             Math.Round((lastClosingPrice - Math.Abs(lastClosingPrice - stopLossLevel) * 6), 5).ToString()
+                    },
+                    TimeInForce = "FOK",
+                    PositionFill = "DEFAULT"
+                },
+                // TrailingStopLossOnFill is not part of OrderRequest.Order, so omit or handle separately if needed
+            });
+
+            return response;
+        }
+
+        private async Task<(decimal stopLossLevel, decimal lotSize)> StopLossAndLotSizeCalculation(Bias marketBias, IndicatorResult analyzeTradeCandle)
+        {
+            var stopLossLevel = IndicatorCalculator.CalculateStopLossForCandle(analyzeTradeCandle, marketBias);
             var lotSize = await _oandaService.CalculateLotSizeAsync(
                        "EUR/USD",
                        decimal.Parse(AppConfig.Get("TradeSettings:Risk")), // You need to provide a decimal riskPercent value here, replace 1 with your actual risk percent
                        analyzeTradeCandle,
-                       stopLossPips,
+                       stopLossLevel,
                        marketBias
                        );
-            return (stopLossPips, lotSize);
+            return (stopLossLevel, lotSize);
         }
 
 
@@ -152,10 +191,10 @@ namespace TradingPlatform.Services
 
             var results = _indicatorService.CalculateIndicators(candles, config);
 
-            if (results.First().Close > results.First().KijunSen && results.Last().Adx > 20)
+            if (results.First().Close > results.First().KijunSen && results.Last().Adx > 25)
                 return Bias.Bullish;
 
-            if (results.First().Close < results.First().KijunSen && results.Last().Adx > 20)
+            if (results.First().Close < results.First().KijunSen && results.Last().Adx > 25)
                 return Bias.Bearish;
 
             return Bias.Neutral;

@@ -61,7 +61,7 @@ namespace TradingPlatform.Services
             string pair,
             decimal riskPercent,
             IndicatorResult lastCandle,
-            decimal stopLossPips,
+            decimal stopLossLevel,
             Bias marketBias
         )
         {
@@ -80,20 +80,25 @@ namespace TradingPlatform.Services
             var account = doc.RootElement.GetProperty("account");
             var balance = decimal.Parse(account.GetProperty("balance").GetString()!);
 
-            // Example calculation for lot size (for USD accounts, major pairs/metals)
-            // RiskAmount = balance * (riskPercent / 100)
-            // LotSize = RiskAmount / (stopLossPips * PipValue)
-            // PipValue for standard lot (100,000 units) for USD pairs is usually $10 per pip
-            // For metals, adjust accordingly (e.g., XAUUSD pip value is $1 for 1 lot)
-
             decimal riskAmount = balance * (riskPercent / 100m);
-            decimal pipValue = pair.StartsWith("XAU") ? 1m : 10m; // crude example
 
-            //     var stopLossPips = IndicatorCalculator.CalculateStopLossForCandle(lastCandle,marketBias);
+            // pip size: JPY pairs use 0.01, others use 0.0001
+            decimal pipSize = pair.EndsWith("JPY", StringComparison.OrdinalIgnoreCase) ? 0.01m : 0.0001m;
+
+            // crude pip value example for USD-quoted pairs / XAU
+            decimal pipValue = pair.StartsWith("XAU", StringComparison.OrdinalIgnoreCase) ? 1m : 10m;
+
+            // convert price difference to pips
+            var stopLossPips = Math.Abs(stopLossLevel - lastCandle.Close) / pipSize;
+
+            if (stopLossPips <= 0) throw new InvalidOperationException("Stop loss must differ from entry price.");
 
             decimal lotSize = riskAmount / (stopLossPips * pipValue);
 
-            return Math.Round(lotSize, 2);
+            // round if you want
+            lotSize = Math.Round(lotSize, 2);
+
+            return lotSize;
         }
 
         public async Task<OrderResponse> PlaceOrderAsync(
@@ -106,26 +111,62 @@ namespace TradingPlatform.Services
                 bearerToken = AppConfig.Get("ApiSettings:OandaAPIKey");
             }
 
-            var url = $"{AppConfig.Get("ApiSettings:BaseUrl")}/orders";
+            var url = $"{AppConfig.Get("ApiSettings:BaseUrl")}orders";
 
             _httpClient.DefaultRequestHeaders.Clear();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+
+            /*
+            var content = new StringContent(
+                JsonSerializer.Serialize(orderRequest, options),
+                Encoding.UTF8,
+                "application/json"
+            );
+            */
+            //   var response = await _httpClient.PostAsync(url, content);
+            
+                  /*      var formattedRequest = new
+                        {
+                            order = new
+                            {
+                                type = "MARKET",
+                                instrument = "EUR_USD",
+                                units = -8445000,
+                                timeInForce = "FOK",
+                                positionFill = "DEFAULT",
+                                stopLossOnFill = new { price = "1.18408" },  //stopLossOnFill = { price = "1.18408" }
+                                takeProfitOnFill = new { price = "1.17947" }  //{ price = "1.17947" }
+                            }
+                        };
+              */
+            var formattedRequest = new
+            {
+                order = new
+                {
+                    type = orderRequest.order.Type,
+                    instrument = orderRequest.order.Instrument,
+                    units = orderRequest.order.Units, // API expects string
+                    timeInForce = orderRequest.order.TimeInForce,
+                    positionFill = orderRequest.order.PositionFill,
+                    stopLossOnFill = orderRequest.order.StopLossOnFill != null
+                            ? new { price = orderRequest.order.StopLossOnFill.Price }
+                            : null,
+                    takeProfitOnFill = orderRequest.order.TakeProfitOnFill != null
+                            ? new { price = orderRequest.order.TakeProfitOnFill.Price }
+                            : null
+                }
+            };
+
+            var response = await _httpClient.PostAsJsonAsync(url, formattedRequest);
+            response.EnsureSuccessStatusCode();
 
             var options = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
             };
-
-            var content = new StringContent(
-                JsonSerializer.Serialize(orderRequest, options),
-                Encoding.UTF8,
-                "application/json"
-            );
-
-            var response = await _httpClient.PostAsync(url, content);
-            response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<OrderResponse>(json, options)

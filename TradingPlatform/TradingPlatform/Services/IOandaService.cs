@@ -14,7 +14,7 @@ namespace TradingPlatform.Services
             string pair,
             decimal riskPercent,
             IndicatorResult lastCandle,
-            decimal stopLossPips,
+            decimal stopLossLevel,
             Bias marketBias
         );
         
