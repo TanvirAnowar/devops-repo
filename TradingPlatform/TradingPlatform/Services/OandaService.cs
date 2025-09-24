@@ -183,6 +183,4 @@ namespace TradingPlatform.Services
 
     // Define model classes for the order request and response
    
-
-    
 }

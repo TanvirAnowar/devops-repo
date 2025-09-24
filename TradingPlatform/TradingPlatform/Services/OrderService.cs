@@ -33,6 +33,19 @@ namespace TradingPlatform.Services
         public async Task<int> ExecuteOrder(IEnumerable<Candle> candles, IndicatorConfig config)
         {
             var brokerActiveTradeOrders = await _oandaService.GetActiveTradeStatusAsync("EUR_USD");
+            var isActiveTrade = brokerActiveTradeOrders.Orders.Any();
+           
+            if (isActiveTrade)
+            {
+                Console.WriteLine("There is an active trade. Exiting ExecuteOrder.");
+                
+                var lastTradeStatusId = brokerActiveTradeOrders.LastTransactionID;
+            }
+            else
+            {
+                Console.WriteLine("No active trade found. Proceeding with order execution.");
+         //       return false;
+            }
             //  var activeTrade = await _tradeStatusService.GetAllAsync();
 
             //   return 0;
