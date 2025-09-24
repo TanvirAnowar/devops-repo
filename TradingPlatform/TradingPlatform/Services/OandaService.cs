@@ -149,9 +149,45 @@ namespace TradingPlatform.Services
                    ?? throw new InvalidOperationException("Failed to deserialize order response");
         }
 
-        public Task<TradeSatus> GetActiveTradeStatusAsync(string currencyPair = "EURUSD")
+        public async Task<ApiOrderResponse> GetActiveTradeStatusAsync(string currencyPair = "EUR_USD")
         {
-            throw new NotImplementedException();
+            var bearerToken = AppConfig.Get("ApiSettings:OandaAPIKey");
+
+            var url = $"{AppConfig.Get("ApiSettings:BaseUrl")}/orders?instrument={currencyPair}";
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+
+            var response = await _httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            
+
+            var result = JsonSerializer.Deserialize<ApiOrderResponse>(json, options);
+
+            /*
+            using var doc = JsonDocument.Parse(json);
+
+            JsonElement root = doc.RootElement;
+
+            JsonElement orders = root.GetProperty("orders");
+            JsonElement lastId = root.GetProperty("lastTransactionID");
+
+            Console.WriteLine($"Orders array length: {orders.GetArrayLength()}");
+            Console.WriteLine($"LastTransactionID: {lastId.GetString()}");
+
+            var orders = doc.RootElement.GetProperty("orders");
+            //var balance = decimal.Parse(account.GetProperty("balance").GetString()!);
+            */
+            var tradeStatus = TradeSatus.NO_ACTIVE_TRADE;
+
+            return tradeStatus;
+            
         }
     }
 

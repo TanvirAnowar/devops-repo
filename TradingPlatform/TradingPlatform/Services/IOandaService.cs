@@ -23,6 +23,6 @@ namespace TradingPlatform.Services
             string bearerToken = ""
         );
 
-        Task<TradeSatus> GetActiveTradeStatusAsync(string currencyPair = "EURUSD");
+        Task<ApiOrderResponse> GetActiveTradeStatusAsync(string currencyPair = "EUR_USD");
     }
 }

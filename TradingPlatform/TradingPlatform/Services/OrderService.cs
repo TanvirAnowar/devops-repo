@@ -32,10 +32,10 @@ namespace TradingPlatform.Services
         // Change the return type of ExecuteOrder from Task<int> to int and remove 'async' and 'await' usage
         public async Task<int> ExecuteOrder(IEnumerable<Candle> candles, IndicatorConfig config)
         {
+            var brokerActiveTradeOrders = await _oandaService.GetActiveTradeStatusAsync("EUR_USD");
+            //  var activeTrade = await _tradeStatusService.GetAllAsync();
 
-            var activeTrade = await _tradeStatusService.GetAllAsync();
-
-         //   return 0;
+            //   return 0;
 
             //1. time check, if the time changed to new hour minuite 
             //2. active order check, if there is no active order
