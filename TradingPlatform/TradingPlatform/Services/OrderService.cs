@@ -32,6 +32,11 @@ namespace TradingPlatform.Services
         // Change the return type of ExecuteOrder from Task<int> to int and remove 'async' and 'await' usage
         public async Task<int> ExecuteOrder(IEnumerable<Candle> candles, IndicatorConfig config)
         {
+
+            var activeTrade = await _tradeStatusService.GetAllAsync();
+
+         //   return 0;
+
             //1. time check, if the time changed to new hour minuite 
             //2. active order check, if there is no active order
             //3. get last 2 indicator result
@@ -63,19 +68,12 @@ namespace TradingPlatform.Services
 
                 string json = JsonSerializer.Serialize(analyzeTradeCandle, options);
 
-                logString += $"\nTrade Setup Info: {json}\n";
+                logString += $"\nTrade Setup Info: {json}\n";             
+            
 
-                //Console.WriteLine(json);
-
-                
-
-                
-
-              //  if (marketBias == Bias.Bullish)
-              if (true)
+              if (marketBias == Bias.Bullish)
                 {
-                //    if (lastClosingPrice > analyzeTradeCandle.Open && lastClosingPrice > analyzeTradeCandle.KijunSen && analyzeTradeCandle.Adx >= 25 && analyzeTradeCandle.Rsi >= 55)
-                  if(true)
+                  if (lastClosingPrice > analyzeTradeCandle.Open && lastClosingPrice > analyzeTradeCandle.KijunSen && analyzeTradeCandle.Adx >= 25 && analyzeTradeCandle.Rsi >= 55)
                     {
 
 
@@ -98,7 +96,7 @@ namespace TradingPlatform.Services
                 }
                 else if (marketBias == Bias.Bearish)
                 {
-                    if (lastClosingPrice < analyzeTradeCandle.Open && lastClosingPrice < analyzeTradeCandle.KijunSen && analyzeTradeCandle.Adx >= 20 && analyzeTradeCandle.Rsi <= 45)
+                    if (lastClosingPrice < analyzeTradeCandle.Open && lastClosingPrice < analyzeTradeCandle.KijunSen && analyzeTradeCandle.Adx >= 25 && analyzeTradeCandle.Rsi <= 45)
                     {
                         (decimal stopLossLevel, decimal lotSize) = await StopLossAndLotSizeCalculation(marketBias, analyzeTradeCandle);
 

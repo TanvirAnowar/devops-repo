@@ -22,5 +22,7 @@ namespace TradingPlatform.Services
             OrderRequest orderRequest,
             string bearerToken = ""
         );
+
+        Task<TradeSatus> GetActiveTradeStatusAsync(string currencyPair = "EURUSD");
     }
 }

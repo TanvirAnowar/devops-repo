@@ -12,22 +12,22 @@ public class TradeStatusService : ITradeStatusService
         _context = context;
     }
 
-    public async Task<List<TradeStatus>> GetAllAsync()
+    public async Task<List<TradeStatusModel>> GetAllAsync()
     {
         return await _context.TradeStatuses.ToListAsync();
     }
 
-    public async Task<TradeStatus?> GetByIdAsync(int id)
+    public async Task<TradeStatusModel?> GetByIdAsync(int id)
     {
         return await _context.TradeStatuses.FindAsync(id);
     }
 
-    public async Task<TradeStatus?> GetByStatusKeyAsync(string statusKey)
+    public async Task<TradeStatusModel?> GetByStatusKeyAsync(string statusKey)
     {
         return await _context.TradeStatuses.FirstOrDefaultAsync(i => i.StatusKey.Equals(statusKey));
     }
 
-    public async Task<TradeStatus> CreateAsync(TradeStatus status)
+    public async Task<TradeStatusModel> CreateAsync(TradeStatusModel status)
     {
         status.UpdatedTime = DateTime.UtcNow;
         _context.TradeStatuses.Add(status);
@@ -35,7 +35,7 @@ public class TradeStatusService : ITradeStatusService
         return status;
     }
 
-    public async Task<bool> UpdateAsync(TradeStatus status)
+    public async Task<bool> UpdateAsync(TradeStatusModel status)
     {
         var existing = await _context.TradeStatuses.FindAsync(status.Id);
         if (existing == null) return false;

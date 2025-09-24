@@ -117,37 +117,13 @@ namespace TradingPlatform.Services
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-
-            /*
-            var content = new StringContent(
-                JsonSerializer.Serialize(orderRequest, options),
-                Encoding.UTF8,
-                "application/json"
-            );
-            */
-            //   var response = await _httpClient.PostAsync(url, content);
-            
-                  /*      var formattedRequest = new
-                        {
-                            order = new
-                            {
-                                type = "MARKET",
-                                instrument = "EUR_USD",
-                                units = -8445000,
-                                timeInForce = "FOK",
-                                positionFill = "DEFAULT",
-                                stopLossOnFill = new { price = "1.18408" },  //stopLossOnFill = { price = "1.18408" }
-                                takeProfitOnFill = new { price = "1.17947" }  //{ price = "1.17947" }
-                            }
-                        };
-              */
             var formattedRequest = new
             {
                 order = new
                 {
                     type = orderRequest.order.Type,
                     instrument = orderRequest.order.Instrument,
-                    units = orderRequest.order.Units, // API expects string
+                    units = orderRequest.order.Units, 
                     timeInForce = orderRequest.order.TimeInForce,
                     positionFill = orderRequest.order.PositionFill,
                     stopLossOnFill = orderRequest.order.StopLossOnFill != null
@@ -171,6 +147,11 @@ namespace TradingPlatform.Services
             var json = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<OrderResponse>(json, options)
                    ?? throw new InvalidOperationException("Failed to deserialize order response");
+        }
+
+        public Task<TradeSatus> GetActiveTradeStatusAsync(string currencyPair = "EURUSD")
+        {
+            throw new NotImplementedException();
         }
     }
 

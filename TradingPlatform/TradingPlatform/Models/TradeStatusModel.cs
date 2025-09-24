@@ -1,6 +1,6 @@
 using System;
 
-public class TradeStatus
+public class TradeStatusModel
 {
     public int Id { get; set; }
     public string StatusKey { get; set; } = string.Empty;

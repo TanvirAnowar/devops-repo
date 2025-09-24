@@ -7,4 +7,10 @@
         Neutral
     }
 
+    public enum TradeSatus
+    {
+        TRADE_ACTIVE = 1,
+        NO_ACTIVE_TRADE = 0,         
+    }
+
 }
