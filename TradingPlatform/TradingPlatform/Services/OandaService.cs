@@ -170,24 +170,14 @@ namespace TradingPlatform.Services
 
             var result = JsonSerializer.Deserialize<ApiOrderResponse>(json, options);
 
-            /*
-            using var doc = JsonDocument.Parse(json);
-
-            JsonElement root = doc.RootElement;
-
-            JsonElement orders = root.GetProperty("orders");
-            JsonElement lastId = root.GetProperty("lastTransactionID");
-
-            Console.WriteLine($"Orders array length: {orders.GetArrayLength()}");
-            Console.WriteLine($"LastTransactionID: {lastId.GetString()}");
-
-            var orders = doc.RootElement.GetProperty("orders");
-            //var balance = decimal.Parse(account.GetProperty("balance").GetString()!);
-            */
-            var tradeStatus = TradeSatus.NO_ACTIVE_TRADE;
-
-            return tradeStatus;
-            
+            if (result != null && result.Orders.Any())
+            {
+                return result;
+            }
+            else
+            {
+                throw new InvalidOperationException("No active trades found.");
+            }            
         }
     }
 
