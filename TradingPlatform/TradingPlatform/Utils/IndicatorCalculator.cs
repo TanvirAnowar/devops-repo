@@ -1,4 +1,5 @@
 using TradingPlatform.Models;
+using TradingPlatform.Models.ApiModels;
 
 namespace TradingPlatform.Utils
 {

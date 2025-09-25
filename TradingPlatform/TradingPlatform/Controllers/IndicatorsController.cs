@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using TradingPlatform.Models;
+using TradingPlatform.Models.ApiModels;
 using TradingPlatform.Services;
 
 namespace TradingPlatform.Controllers

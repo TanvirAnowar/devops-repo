@@ -1,4 +1,5 @@
 using TradingPlatform.Models;
+using TradingPlatform.Models.ApiModels;
 
 namespace TradingPlatform.Services
 {
@@ -24,5 +25,7 @@ namespace TradingPlatform.Services
         );
 
         Task<ApiOrderResponse> GetActiveTradeStatusAsync(string currencyPair = "EUR_USD");
+
+        Task<ApiOrderResponse> GetTradeByIdAsync(string id);
     }
 }

@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using TradingPlatform.Models;
+using TradingPlatform.Models.ApiModels;
 using TradingPlatform.Utils;
 
 namespace TradingPlatform.Services
@@ -123,7 +124,7 @@ namespace TradingPlatform.Services
                 {
                     type = orderRequest.order.Type,
                     instrument = orderRequest.order.Instrument,
-                    units = orderRequest.order.Units, 
+                    units = orderRequest.order.Units,
                     timeInForce = orderRequest.order.TimeInForce,
                     positionFill = orderRequest.order.PositionFill,
                     stopLossOnFill = orderRequest.order.StopLossOnFill != null
@@ -166,7 +167,7 @@ namespace TradingPlatform.Services
             {
                 PropertyNameCaseInsensitive = true
             };
-            
+
 
             var result = JsonSerializer.Deserialize<ApiOrderResponse>(json, options);
 
@@ -177,10 +178,61 @@ namespace TradingPlatform.Services
             else
             {
                 throw new InvalidOperationException("No active trades found.");
-            }            
+            }
+        }
+
+        public async Task<ApiOrderResponse> GetTradeByIdAsync(string id)
+        {
+            var bearerToken = AppConfig.Get("ApiSettings:OandaAPIKey");
+
+            var url = $"{AppConfig.Get("ApiSettings:BaseUrl")}/orders/{id}";
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+
+            var response = await _httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            // Parse the JSON document to handle the structure properly
+            using var document = JsonDocument.Parse(json);
+            
+            // Create a new ApiOrderResponse
+            var apiResponse = new ApiOrderResponse
+            {
+                Orders = new List<Order>()
+            };
+            
+            // Check if response has the order property
+            if (document.RootElement.TryGetProperty("order", out var orderElement))
+            {
+                // Deserialize the single order
+                var order = JsonSerializer.Deserialize<Order>(orderElement.GetRawText(), options);
+                if (order != null)
+                {
+                    apiResponse.Orders.Add(order);
+                }
+            }
+            
+            // Extract the lastTransactionID if it exists
+            if (document.RootElement.TryGetProperty("lastTransactionID", out var lastTransactionIdElement))
+            {
+                apiResponse.LastTransactionID = lastTransactionIdElement.GetString() ?? string.Empty;
+            }
+            
+            if (apiResponse.Orders.Count == 0)
+            {
+                throw new InvalidOperationException("No order found in the response");
+            }
+            
+            return apiResponse;
         }
     }
-
-    // Define model classes for the order request and response
-   
 }
+
+    

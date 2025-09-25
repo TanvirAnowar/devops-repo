@@ -1,4 +1,4 @@
-using TradingPlatform.Models;
+using TradingPlatform.Models.ApiModels;
 using TradingPlatform.Utils;
 
 namespace TradingPlatform.Services

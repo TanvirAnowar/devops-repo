@@ -36,6 +36,9 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ITradeStatusService, TradeStatusService>();
 builder.Services.AddHttpClient<IOandaService, OandaService>();
 
+// DB Services
+builder.Services.AddScoped<IActiveOrderService, ActiveOrderService>();
+
 //Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

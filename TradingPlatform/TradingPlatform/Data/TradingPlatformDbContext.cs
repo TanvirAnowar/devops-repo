@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using TradingPlatform.Models.DbModels;
+using TradingPlatform.Services;
 
 public class TradingPlatformDbContext : DbContext
 {
@@ -6,4 +8,6 @@ public class TradingPlatformDbContext : DbContext
         : base(options) { }
 
     public DbSet<TradeStatusModel> TradeStatuses { get; set; }
+    public DbSet<ActiveOrder> ActiveOrders { get; set; }
 }
+

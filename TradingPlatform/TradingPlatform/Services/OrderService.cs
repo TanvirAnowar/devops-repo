@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using TradingPlatform.Models;
+using TradingPlatform.Models.ApiModels;
 using TradingPlatform.Services;
 using TradingPlatform.Utils;
 
@@ -34,12 +35,24 @@ namespace TradingPlatform.Services
         {
             var brokerActiveTradeOrders = await _oandaService.GetActiveTradeStatusAsync("EUR_USD");
             var isActiveTrade = brokerActiveTradeOrders.Orders.Any();
+
+            IEnumerable<IndicatorResult> results = null;
            
             if (isActiveTrade)
             {
                 Console.WriteLine("There is an active trade. Exiting ExecuteOrder.");
                 
                 var lastTradeStatusId = brokerActiveTradeOrders.LastTransactionID;
+
+                results = _indicatorService.CalculateIndicators(candles, config);
+
+                var existingOrderInfo = await _oandaService.GetTradeByIdAsync(lastTradeStatusId);
+
+                var existingOrder = existingOrderInfo.Orders.FirstOrDefault();
+
+                var orderType = existingOrder.Type;
+
+
             }
             else
             {
@@ -53,7 +66,11 @@ namespace TradingPlatform.Services
             //1. time check, if the time changed to new hour minuite 
             //2. active order check, if there is no active order
             //3. get last 2 indicator result
-            var results = _indicatorService.CalculateIndicators(candles, config);
+            
+            if (results == null)
+            {
+                results = _indicatorService.CalculateIndicators(candles, config);
+            }
             //4. should close order check
             //5. should open order check
             //6. Get bias from higher timeframe

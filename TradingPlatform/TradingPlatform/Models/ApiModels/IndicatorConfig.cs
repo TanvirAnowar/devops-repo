@@ -1,4 +1,4 @@
-namespace TradingPlatform.Models
+namespace TradingPlatform.Models.ApiModels
 {
     public class IchimokuConfig
     {

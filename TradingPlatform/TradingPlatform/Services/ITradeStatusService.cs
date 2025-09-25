@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TradingPlatform.Models;
+using TradingPlatform.Models.DbModels;
 
 public interface ITradeStatusService
 {
