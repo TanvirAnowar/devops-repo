@@ -171,14 +171,7 @@ namespace TradingPlatform.Services
 
             var result = JsonSerializer.Deserialize<ApiOrderResponse>(json, options);
 
-            if (result != null && result.Orders.Any())
-            {
-                return result;
-            }
-            else
-            {
-                throw new InvalidOperationException("No active trades found.");
-            }
+            return result;
         }
 
         public async Task<ApiOrderResponse> GetTradeByIdAsync(string id)

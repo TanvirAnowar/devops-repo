@@ -130,5 +130,28 @@ namespace TradingPlatform.Services
             
             return true;
         }
+
+        /// <summary>
+        /// Updates only the IsOrderActive field for an order with the specified ID
+        /// </summary>
+        /// <param name="id">The order ID</param>
+        /// <returns>True if the order was updated, false if the order was not found</returns>
+        public async Task<bool> UpdateActiveOrderAsync(string id)
+        {
+            var order = await _dbContext.ActiveOrders
+                .FirstOrDefaultAsync(o => o.Id == id);
+
+            if (order == null)
+            {
+                return false;
+            }
+
+            // Update only the IsOrderActive field
+            order.IsOrderActive = false;
+            _dbContext.ActiveOrders.Update(order);
+            await _dbContext.SaveChangesAsync();
+            
+            return true;
+        }
     }
 }
