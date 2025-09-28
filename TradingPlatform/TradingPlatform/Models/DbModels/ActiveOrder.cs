@@ -19,6 +19,8 @@ namespace TradingPlatform.Models.DbModels
 
         public bool IsOrderActive { get; set; }
 
+        public bool ShouldTrailStopLoss { get; set; }
+
         public DateTime OrderDateTime { get; set; }
     }
 

@@ -68,6 +68,8 @@ namespace TradingPlatform.Services
 
                 // sell close condition
 
+                
+
                 if (activeOrderStatus?.StopLossPrice != null && analyzeTradeCandle.KijunSen.HasValue)
                 {
                     if (Convert.ToDecimal(activeOrderStatus.StopLossPrice) < analyzeTradeCandle.KijunSen.Value)
@@ -282,7 +284,17 @@ namespace TradingPlatform.Services
             return (stopLossLevel, lotSize);
         }
 
+        private decimal trailStopLossCount(string currentHighPrice, string units, string stopLossLevel, string price)
+        {
+            if(Convert.ToDecimal(units) > 0)
+            {
+                var diff =  Convert.ToDecimal(stopLossLevel) - Convert.ToDecimal(price);
 
+            }
+
+
+            return 0;
+        }
 
         // Keep the async version for future use if interface is updated
         private async Task<Bias> GetBiasStatusAsync(IndicatorConfig config, string higherTimeframe = "H1")
