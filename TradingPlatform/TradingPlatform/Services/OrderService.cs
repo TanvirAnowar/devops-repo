@@ -47,17 +47,18 @@ namespace TradingPlatform.Services
 
             var activeOrderStatus = activeOrders.FirstOrDefault();
 
-        //    IEnumerable<IndicatorResult> results = null;
-           
+
+            var results = _indicatorService.CalculateIndicators(candles, config);
+
+            var analyzeTradeCandle = results.Last();
+
             if (isActiveTrade)
             {
                 Console.WriteLine("There is an active trade. Exiting ExecuteOrder.");
                 
                 var lastTradeStatusId = brokerActiveTradeOrders.LastTransactionID;
 
-                var results = _indicatorService.CalculateIndicators(candles, config);
-
-                var analyzeTradeCandle = results.Last();
+                
 
                 var existingOrderInfo = await _oandaService.GetTradeByIdAsync(lastTradeStatusId);
 
@@ -68,7 +69,16 @@ namespace TradingPlatform.Services
 
                 // sell close condition
 
-                
+
+                // trade break even condition
+
+                if (this.trailStopLossCount(analyzeTradeCandle,activeOrderStatus.Unites, activeOrderStatus.StopLossPrice, activeOrderStatus.EntryPrice).HasValue)
+                {
+
+                }
+
+
+                /*
 
                 if (activeOrderStatus?.StopLossPrice != null && analyzeTradeCandle.KijunSen.HasValue)
                 {
@@ -77,6 +87,8 @@ namespace TradingPlatform.Services
                         // Your logic here
                     }
                 }
+
+                */
 
 
             }
@@ -89,7 +101,7 @@ namespace TradingPlatform.Services
                 if (activeOrders.Any())
                 {
 
-                    var isUpdated = await _activeOrderService.UpdateActiveOrderAsync(activeOrderStatus.Id);
+                    var isUpdated = await _activeOrderService.UpdateActiveOrderToFalseAsync(activeOrderStatus.Id);
                 }
 
 
@@ -139,8 +151,8 @@ namespace TradingPlatform.Services
                 logString += $"\nTrade Setup Info: {json}\n";             
             
 
-     //         if (marketBias == Bias.Bullish)
-              if (false)
+              if (marketBias == Bias.Bullish)
+     //         if (false)
                 {
                   if (lastClosingPrice > analyzeTradeCandle.Open && lastClosingPrice > analyzeTradeCandle.KijunSen && analyzeTradeCandle.Adx >= 25 && analyzeTradeCandle.Rsi >= 55)
                     {
@@ -163,11 +175,11 @@ namespace TradingPlatform.Services
 
                     }
                 }
-     //           else if (marketBias == Bias.Bearish)
-                else if (true)
+                else if (marketBias == Bias.Bearish)
+       //         else if (true)
                 {
-       //             if (lastClosingPrice < analyzeTradeCandle.Open && lastClosingPrice < analyzeTradeCandle.KijunSen && analyzeTradeCandle.Adx >= 25 && analyzeTradeCandle.Rsi <= 45)
-                    if (true)
+                    if (lastClosingPrice < analyzeTradeCandle.Open && lastClosingPrice < analyzeTradeCandle.KijunSen && analyzeTradeCandle.Adx >= 25 && analyzeTradeCandle.Rsi <= 45)
+       //             if (true)
                     {
                         (decimal stopLossLevel, decimal lotSize) = await StopLossAndLotSizeCalculation(marketBias, analyzeTradeCandle);
 
@@ -284,16 +296,34 @@ namespace TradingPlatform.Services
             return (stopLossLevel, lotSize);
         }
 
-        private decimal trailStopLossCount(string currentHighPrice, string units, string stopLossLevel, string price)
+        private decimal? trailStopLossCount(IndicatorResult analyzeTradeCandle, string units, string stopLossLevel, string price)
         {
-            if(Convert.ToDecimal(units) > 0)
+            var diff = 0.0m;
+            // for buy order only
+            if (Convert.ToDecimal(units) > 0)
             {
-                var diff =  Convert.ToDecimal(stopLossLevel) - Convert.ToDecimal(price);
 
+                diff = Convert.ToDecimal(stopLossLevel) - Convert.ToDecimal(price);
+
+                if (Convert.ToDecimal(analyzeTradeCandle.High) - Convert.ToDecimal(price) >= (Convert.ToDecimal(analyzeTradeCandle.High) + diff * 2))
+                {
+                    // return Convert.ToDecimal(currentHighPrice) - diff;
+                    return Convert.ToDecimal(price);
+                }
+            }
+
+            if(Convert.ToDecimal(units)<0)
+            {
+                diff = Convert.ToDecimal(stopLossLevel) - Convert.ToDecimal(price);
+                if (Convert.ToDecimal(price) - Convert.ToDecimal(analyzeTradeCandle.Low) >= (Convert.ToDecimal(analyzeTradeCandle.Low)  - diff * 2))
+                {
+                      return Convert.ToDecimal(price);
+                        //  return Convert.ToDecimal(currentHighPrice) + diff;
+                }
             }
 
 
-            return 0;
+            return null;
         }
 
         // Keep the async version for future use if interface is updated

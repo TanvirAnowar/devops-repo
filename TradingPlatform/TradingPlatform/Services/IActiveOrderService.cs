@@ -10,7 +10,7 @@ namespace TradingPlatform.Services
         Task<ActiveOrder?> GetActiveOrderByIdAsync(string id);
         Task<ActiveOrder> AddOrderAsync(ActiveOrder order);
         Task<ActiveOrder> UpdateOrderAsync(ActiveOrder order);
-        Task<bool> UpdateActiveOrderAsync(string id);
+        Task<bool> UpdateActiveOrderToFalseAsync(string id);
         Task<bool> DeactivateOrderAsync(string id);
         Task<bool> DeleteOrderAsync(string id);
     }

@@ -136,7 +136,7 @@ namespace TradingPlatform.Services
         /// </summary>
         /// <param name="id">The order ID</param>
         /// <returns>True if the order was updated, false if the order was not found</returns>
-        public async Task<bool> UpdateActiveOrderAsync(string id)
+        public async Task<bool> UpdateActiveOrderToFalseAsync(string id)
         {
             var order = await _dbContext.ActiveOrders
                 .FirstOrDefaultAsync(o => o.Id == id);
