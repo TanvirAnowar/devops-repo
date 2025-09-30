@@ -2,10 +2,13 @@ using System;
 
 namespace TradingPlatform.Models.DbModels
 {
-    
     public class ActiveOrder
     {
         public string Id { get; set; } = string.Empty;
+
+        public string IdStopLoss { get; set; } = string.Empty;
+
+        public string IdTakeProfit { get; set; } = string.Empty;
 
         public string Unites { get; set; } = string.Empty;
 
@@ -17,11 +20,11 @@ namespace TradingPlatform.Models.DbModels
 
         public string OrderJsonObject { get; set; } = string.Empty;
 
-        public bool IsOrderActive { get; set; }
+        // Make booleans nullable to handle DB NULLs safely
+        public bool? IsOrderActive { get; set; }
 
-        public bool ShouldTrailStopLoss { get; set; }
+        public bool? ShouldTrailStopLoss { get; set; }
 
         public DateTime OrderDateTime { get; set; }
     }
-
 }

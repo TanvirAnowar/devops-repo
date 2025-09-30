@@ -94,9 +94,7 @@ namespace TradingPlatform.Services
             }
             else
             {
-                // Close a order in DB if its not active at broker
-
-                
+                // Close a order in DB if its not active at broker               
 
                 if (activeOrders.Any())
                 {
@@ -108,7 +106,7 @@ namespace TradingPlatform.Services
 
 
 
-                throw new Exception("No active trade found. Proceeding with order execution.");
+             //   throw new Exception("No active trade found. Proceeding with order execution.");
                 Console.WriteLine("No active trade found. Proceeding with order execution.");
          //       return false;
             }
@@ -151,10 +149,11 @@ namespace TradingPlatform.Services
                 logString += $"\nTrade Setup Info: {json}\n";             
             
 
-              if (marketBias == Bias.Bullish)
-     //         if (false)
+      //        if (marketBias == Bias.Bullish)
+              if (true)
                 {
-                  if (lastClosingPrice > analyzeTradeCandle.Open && lastClosingPrice > analyzeTradeCandle.KijunSen && analyzeTradeCandle.Adx >= 25 && analyzeTradeCandle.Rsi >= 55)
+     //             if (lastClosingPrice > analyzeTradeCandle.Open && lastClosingPrice > analyzeTradeCandle.KijunSen && analyzeTradeCandle.Adx >= 25 && analyzeTradeCandle.Rsi >= 55)
+                   if(true)
                     {
 
 
@@ -249,6 +248,7 @@ namespace TradingPlatform.Services
 
         private async Task<ActiveOrder> SaveActiceOrderInforamtion(decimal lastClosingPrice, decimal stopLossLevel, decimal lotSize, Bias bias, OrderResponse response)
         {
+            
             // Limit the length of the string values to prevent "Data too long" errors
             var stopLossString = Math.Round(stopLossLevel, 5).ToString();
             var takeProfitValue = bias == Bias.Bullish
@@ -263,11 +263,16 @@ namespace TradingPlatform.Services
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
             var jsonString = JsonSerializer.Serialize(response, jsonOptions);
+
+            var relatedTransactionIDs = response.RelatedTransactionIDs;
+
             
             // Create the ActiveOrder with controlled string lengths
             var activeOrder = new ActiveOrder
             {
                 Id = response.orderCreateTransaction?.Id ?? Guid.NewGuid().ToString(),
+                IdStopLoss = relatedTransactionIDs[^1],
+                IdTakeProfit = relatedTransactionIDs[^2],
                 EntryPrice = Math.Round(lastClosingPrice, 5).ToString(),
                 StopLossPrice = stopLossString,
                 TakeProfitPrice = takeProfitString,

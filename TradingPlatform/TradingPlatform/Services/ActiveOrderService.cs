@@ -1,9 +1,10 @@
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading.Tasks;
 using TradingPlatform.Models.DbModels;
+using static TradingPlatform.Models.ApiModels.OrderRequest;
 
 namespace TradingPlatform.Services
 {
@@ -22,9 +23,17 @@ namespace TradingPlatform.Services
         /// <returns>List of active orders</returns>
         public async Task<List<ActiveOrder>> GetAllActiveOrdersAsync()
         {
-            return await _dbContext.ActiveOrders
-                .Where(o => o.IsOrderActive)
+            var id = "77";
+            var x = await _dbContext.ActiveOrders.ToListAsync();
+
+         
+
+
+            var result = await _dbContext.ActiveOrders
+                .Where(o => o.IsOrderActive == true)
                 .ToListAsync();
+
+            return result;
         }
 
         /// <summary>
