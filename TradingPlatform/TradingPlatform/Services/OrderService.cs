@@ -1,15 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Reflection.Metadata;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using TradingPlatform.Models;
 using TradingPlatform.Models.ApiModels;
 using TradingPlatform.Models.DbModels;
-using TradingPlatform.Services;
 using TradingPlatform.Utils;
 
 namespace TradingPlatform.Services
