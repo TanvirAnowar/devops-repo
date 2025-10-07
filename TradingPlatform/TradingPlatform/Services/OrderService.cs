@@ -142,11 +142,11 @@ namespace TradingPlatform.Services
                 logString += $"\nTrade Setup Info: {json}\n";             
             
 
-      //        if (marketBias == Bias.Bullish)
-              if (true)
+              if (marketBias == Bias.Bullish)
+      //        if (true)
                 {
-     //             if (lastClosingPrice > analyzeTradeCandle.Open && lastClosingPrice > analyzeTradeCandle.KijunSen && analyzeTradeCandle.Adx >= 25 && analyzeTradeCandle.Rsi >= 55)
-                   if(true)
+                  if (lastClosingPrice > analyzeTradeCandle.Open && lastClosingPrice > analyzeTradeCandle.KijunSen && analyzeTradeCandle.Adx >= 25 && analyzeTradeCandle.Rsi >= 55)
+        //           if(true)
                     {
 
 
