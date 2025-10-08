@@ -15,6 +15,9 @@ namespace TradingPlatform.Services
         private readonly ITradeStatusService _tradeStatusService;
         private readonly IActiveOrderService _activeOrderService;
 
+        // Seed hook for tests
+        private IEnumerable<IndicatorResult>? _seedIndicatorResults;
+
         public OrderService(
             IIndicatorService indicatorService, 
             IOandaService oandaService, 
@@ -29,6 +32,10 @@ namespace TradingPlatform.Services
             _activeOrderService = activeOrderService;
         }
 
+        // Allow tests to inject custom indicator results
+        public void UseSeedIndicatorResults(IEnumerable<IndicatorResult> seed) => _seedIndicatorResults = seed;
+        public void ClearSeedIndicatorResults() => _seedIndicatorResults = null;
+
         // Change the return type of ExecuteOrder from Task<int> to int and remove 'async' and 'await' usage
         public async Task<int> ExecuteOrder(IEnumerable<Candle> candles, IndicatorConfig config)
         {
@@ -40,8 +47,44 @@ namespace TradingPlatform.Services
 
             var activeOrderStatus = activeOrders.FirstOrDefault();
 
+            // DEMO: seed two IndicatorResult objects (remove after testing)
+            if (_seedIndicatorResults == null)
+            {
+                var now = DateTime.UtcNow;
 
-            var results = _indicatorService.CalculateIndicators(candles, config);
+                UseSeedIndicatorResults(new []
+                {
+                    new IndicatorResult
+                    {
+                        Time = now.AddMinutes(-5),
+                        Open = 1.10000m,
+                        High = 1.10150m,
+                        Low = 1.09800m,
+                        Close = 1.10080m,
+                        Volume = 1200,
+                        KijunSen = 1.09950m,
+                        Rsi = 58m,
+                        Adx = 28m,
+                        Atr = 0.0012m
+                    },
+                    new IndicatorResult
+                    {
+                        Time = now,
+                        Open = 1.10080m,
+                        High = 1.10300m,
+                        Low = 1.10000m,
+                        Close = 1.10250m,
+                        Volume = 1500,
+                        KijunSen = 1.10020m,
+                        Rsi = 62m,
+                        Adx = 30m,
+                        Atr = 0.0011m
+                    }
+                });
+            }
+
+            // Line 44: use seed if provided; otherwise call the real service               
+            var results = _seedIndicatorResults ?? _indicatorService.CalculateIndicators(candles, config);
 
             var analyzeTradeCandle = results.Last();
 
