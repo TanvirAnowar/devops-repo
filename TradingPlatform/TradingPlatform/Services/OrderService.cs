@@ -95,26 +95,12 @@ namespace TradingPlatform.Services
                     var isUpdated = await _activeOrderService.UpdateActiveOrderToFalseAsync(activeOrderStatus.Id);
                 }
 
-
-
-
-
-             //   throw new Exception("No active trade found. Proceeding with order execution.");
                 Console.WriteLine("No active trade found. Proceeding with order execution.");
          //       return false;
             }
             //  var activeTrade = await _tradeStatusService.GetAllAsync();
 
-            //   return 0;
 
-            //1. time check, if the time changed to new hour minuite 
-            //2. active order check, if there is no active order
-            //3. get last 2 indicator result
-            
-       
-            //4. should close order check
-            //5. should open order check
-            //6. Get bias from higher timeframe
             // NOTE: Synchronous version, so cannot await GetBiasStatusAsync
             // If async is required, interface and all usages must be updated to async
 
