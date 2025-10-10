@@ -75,7 +75,7 @@ namespace TradingPlatform.Services
                         Low = 1.10000m,
                         Close = 1.10250m,
                         Volume = 1500,
-                        KijunSen = 1.10020m,
+                        KijunSen = 1.09020m,
                         Rsi = 62m,
                         Adx = 30m,
                         Atr = 0.0011m
@@ -363,7 +363,7 @@ namespace TradingPlatform.Services
                 AppConfig.Get("ApiSettings:OandaAPIKey")
                 );
 
-            var results = _indicatorService.CalculateIndicators(candles, config);
+            var results = _seedIndicatorResults ?? _indicatorService.CalculateIndicators(candles, config); //_indicatorService.CalculateIndicators(candles, config);
 
             if (results.First().Close > results.First().KijunSen && results.Last().Adx > 25)
                 return Bias.Bullish;
