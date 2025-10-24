@@ -201,7 +201,7 @@ To persist, add to `/etc/fstab`.
 - Keep `rsync` handy for quick, reliable deployments.  
 - Combine `grep`, `awk`, `sed`, `find`, and `xargs` to automate text and file ops.
 
-```bash
+
 # Quick Handy DevOps combo example:
 find /var/log -name "*.log" -mtime +7 -print0 | xargs -0 rm -f
 
