@@ -42,6 +42,9 @@ dic_exmp_2 = {
 
     
 print(dic_exmp_2.get("priceX", "not found")) 
+
+dic_exmp_2.update({"price": 9900})
+print(dic_exmp_2["price"])
 '''
 envronment_values =[dic_exmp, dic_exmp_2]
 
