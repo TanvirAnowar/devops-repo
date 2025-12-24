@@ -1,0 +1,8 @@
+This is a demo text file for the PythoScout project.
+
+Welcome to the DevOps repository!
+
+This file demonstrates basic text file operations.
+You can use this file to practice reading and writing text content.
+
+Feel free to modify this content as needed for your testing purposes.
